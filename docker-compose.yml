@@ -1,0 +1,114 @@
+name: ai-orchestration-platform
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-orchestrator}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-orchestrator}
+      POSTGRES_DB: ${POSTGRES_DB:-orchestrator}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-orchestrator}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-orchestrator}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-orchestrator}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-orchestrator}:${POSTGRES_PASSWORD:-orchestrator}@postgres:5432/${POSTGRES_DB:-orchestrator}
+      DATABASE_URL_SYNC: postgresql+psycopg://${POSTGRES_USER:-orchestrator}:${POSTGRES_PASSWORD:-orchestrator}@postgres:5432/${POSTGRES_DB:-orchestrator}
+      CELERY_BROKER_URL: amqp://${RABBITMQ_USER:-orchestrator}:${RABBITMQ_PASSWORD:-orchestrator}@rabbitmq:5672//
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.worker
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-orchestrator}:${POSTGRES_PASSWORD:-orchestrator}@postgres:5432/${POSTGRES_DB:-orchestrator}
+      DATABASE_URL_SYNC: postgresql+psycopg://${POSTGRES_USER:-orchestrator}:${POSTGRES_PASSWORD:-orchestrator}@postgres:5432/${POSTGRES_DB:-orchestrator}
+      CELERY_BROKER_URL: amqp://${RABBITMQ_USER:-orchestrator}:${RABBITMQ_PASSWORD:-orchestrator}@rabbitmq:5672//
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      backend:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  seed:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-orchestrator}:${POSTGRES_PASSWORD:-orchestrator}@postgres:5432/${POSTGRES_DB:-orchestrator}
+    entrypoint: []
+    command: ["python", "scripts/seed.py"]
+    depends_on:
+      backend:
+        condition: service_started
+    profiles: ["tools"]
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
