@@ -28,6 +28,7 @@ execution_status = postgresql.ENUM(
     "retrying",
     "cancelled",
     name="execution_status",
+    create_type=False,
 )
 step_status = postgresql.ENUM(
     "pending",
@@ -37,8 +38,11 @@ step_status = postgresql.ENUM(
     "retrying",
     "skipped",
     name="step_status",
+    create_type=False,
 )
-log_level = postgresql.ENUM("debug", "info", "warning", "error", name="log_level")
+log_level = postgresql.ENUM(
+    "debug", "info", "warning", "error", name="log_level", create_type=False
+)
 
 
 def upgrade() -> None:
