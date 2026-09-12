@@ -49,18 +49,24 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h1>Dashboard</h1>
-          <p className="page-subtitle">Overview of workflows and recent execution activity.</p>
+          <p className="text-[0.85rem] text-muted">
+            Overview of workflows and recent execution activity.
+          </p>
         </div>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && (
+        <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
+          {error}
+        </div>
+      )}
 
       {!error && (
         <>
-          <div className="stat-grid">
+          <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
             <StatTile label="Workflows" value={workflowTotal} />
             <StatTile label="Total Executions" value={executionTotal} />
             <StatTile label="Running" value={statusCounts.running} />

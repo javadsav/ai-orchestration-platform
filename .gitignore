@@ -21,6 +21,7 @@ out/
 frontend/dist/
 .turbo/
 coverage/
+*.tsbuildinfo
 
 # --- Env / secrets ---
 .env

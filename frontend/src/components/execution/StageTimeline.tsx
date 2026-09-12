@@ -1,5 +1,14 @@
 import { StepStatusBadge } from "@/components/execution/ExecutionStatusBadge";
-import type { ExecutionStep } from "@/lib/api/types";
+import type { ExecutionStep, StepStatus } from "@/lib/api/types";
+
+const STATUS_BORDER_CLASSES: Record<StepStatus, string> = {
+  pending: "border-l-neutral",
+  running: "border-l-info",
+  succeeded: "border-l-success",
+  failed: "border-l-danger",
+  retrying: "border-l-warning",
+  skipped: "border-l-neutral",
+};
 
 function formatDuration(ms: number | null): string {
   if (ms === null) return "–";
@@ -13,20 +22,25 @@ interface StageTimelineProps {
 
 export function StageTimeline({ steps }: StageTimelineProps) {
   if (steps.length === 0) {
-    return <p className="table-empty">No steps yet.</p>;
+    return <p className="py-4 text-[0.85rem] text-muted">No steps yet.</p>;
   }
 
   return (
-    <ol className="stage-timeline">
+    <ol className="m-0 flex list-none flex-col gap-[0.6rem] p-0">
       {steps.map((step) => (
-        <li key={`${step.stage_key}-${step.attempt}`} className={`stage-item stage-${step.status}`}>
-          <div className="stage-item-header">
-            <span className="stage-order">{step.stage_order + 1}</span>
-            <span className="stage-key">{step.stage_key}</span>
+        <li
+          key={`${step.stage_key}-${step.attempt}`}
+          className={`rounded-md border border-l-[3px] border-border bg-surface-alt px-[0.8rem] py-[0.6rem] ${STATUS_BORDER_CLASSES[step.status]}`}
+        >
+          <div className="flex items-center gap-[0.6rem] text-[0.88rem]">
+            <span className="w-[1.4em] font-mono text-muted">{step.stage_order + 1}</span>
+            <span className="flex-1 font-semibold">{step.stage_key}</span>
             <StepStatusBadge status={step.status} />
-            {step.attempt > 1 && <span className="stage-attempt">attempt {step.attempt}</span>}
+            {step.attempt > 1 && (
+              <span className="text-[0.75rem] text-muted">attempt {step.attempt}</span>
+            )}
           </div>
-          <div className="stage-item-meta">
+          <div className="mt-1 flex flex-wrap gap-4 text-[0.75rem] text-muted">
             <span>duration: {formatDuration(step.duration_ms)}</span>
             {step.started_at && (
               <span>started: {new Date(step.started_at).toLocaleTimeString()}</span>
@@ -35,7 +49,9 @@ export function StageTimeline({ steps }: StageTimelineProps) {
               <span>finished: {new Date(step.finished_at).toLocaleTimeString()}</span>
             )}
           </div>
-          {step.error_message && <div className="stage-error">{step.error_message}</div>}
+          {step.error_message && (
+            <div className="mt-1.5 font-mono text-[0.8rem] text-danger">{step.error_message}</div>
+          )}
         </li>
       ))}
     </ol>

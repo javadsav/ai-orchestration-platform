@@ -19,14 +19,18 @@ export default async function WorkflowsPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h1>Workflows</h1>
-          <p className="page-subtitle">All defined workflow pipelines.</p>
+          <p className="text-[0.85rem] text-muted">All defined workflow pipelines.</p>
         </div>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && (
+        <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
+          {error}
+        </div>
+      )}
 
       {!error && (
         <Card>

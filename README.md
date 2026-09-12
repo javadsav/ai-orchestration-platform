@@ -91,6 +91,23 @@ Seed a demo workflow:
 docker compose run --rm backend python scripts/seed.py
 ```
 
+### Live-reload while developing
+
+`docker-compose.override.yml` is picked up automatically by `docker compose up`
+and gives each service live reload:
+
+- **backend** — bind-mounts `backend/app` and runs `uvicorn --reload`; edits
+  take effect immediately.
+- **worker** — same bind mount, but Celery does not hot-reload code; after
+  editing a task, run `docker compose restart worker`.
+- **frontend** — bind-mounts the whole `frontend/` directory and runs
+  `next dev` instead of a production build, so edits hot-reload in the
+  browser. `node_modules` and `.next` are kept in named volumes so the host's
+  install doesn't shadow the container's.
+
+To run the production images instead (e.g. to sanity-check a deploy), ignore
+the override: `docker compose -f docker-compose.yml up --build`.
+
 Then open http://localhost:3000, trigger the seeded workflow from the
 Workflows page, and open its Execution Detail page to watch it move through
 each stage live.

@@ -24,24 +24,31 @@ export default async function SystemHealthPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h1>System Health</h1>
-          <p className="page-subtitle">Live readiness of backend dependencies.</p>
+          <p className="text-[0.85rem] text-muted">Live readiness of backend dependencies.</p>
         </div>
         {ready && (
           <Badge tone={ready.status === "ok" ? "success" : "warning"}>{ready.status}</Badge>
         )}
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && (
+        <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
+          {error}
+        </div>
+      )}
 
       {ready && (
         <Card title="Dependencies">
-          <div className="health-grid">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3">
             {Object.entries(ready.checks).map(([name, value]) => (
-              <div className="health-item" key={name}>
-                <span className="health-item-label">{name}</span>
+              <div
+                className="flex flex-col gap-1 rounded-md border border-border bg-surface-alt px-4 py-3"
+                key={name}
+              >
+                <span className="text-[0.75rem] tracking-wide text-muted uppercase">{name}</span>
                 <Badge tone={toneFor(String(value))}>{String(value)}</Badge>
               </div>
             ))}

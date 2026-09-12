@@ -26,7 +26,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
       notFound();
     }
     return (
-      <div className="error-box">
+      <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
         {err instanceof Error ? err.message : "Failed to load workflow."}
       </div>
     );
@@ -43,20 +43,20 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h1>{workflow.name}</h1>
-          <p className="page-subtitle">{workflow.description ?? "No description."}</p>
+          <p className="text-[0.85rem] text-muted">{workflow.description ?? "No description."}</p>
         </div>
         <TriggerExecutionButton workflowId={workflow.id} />
       </div>
 
       <Card title="Stages">
-        <ol className="stage-def-list">
+        <ol className="flex list-decimal flex-col gap-1.5 pl-6">
           {workflow.stage_definitions.map((stage) => (
-            <li key={stage.key} className="stage-def-item">
-              <strong>{stage.label}</strong>
-              <span className="stage-def-meta">
+            <li key={stage.key}>
+              <strong className="mr-2">{stage.label}</strong>
+              <span className="text-[0.8rem] text-muted">
                 ({stage.key}) · failure rate {(stage.failure_rate * 100).toFixed(0)}% ·{" "}
                 {stage.min_duration_ms}–{stage.max_duration_ms}ms
               </span>
@@ -66,7 +66,11 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
       </Card>
 
       <Card title="Executions">
-        {executionsError && <div className="error-box">{executionsError}</div>}
+        {executionsError && (
+          <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
+            {executionsError}
+          </div>
+        )}
         {!executionsError && (
           <Table
             rows={executions}

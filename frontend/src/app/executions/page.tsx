@@ -37,31 +37,36 @@ export default async function ExecutionsPage({ searchParams }: PageProps) {
     error = err instanceof Error ? err.message : "Failed to load executions.";
   }
 
+  const filterLinkClass = (active: boolean) =>
+    `rounded-full border px-3 py-1.5 text-[0.8rem] no-underline hover:text-ink hover:no-underline ${
+      active ? "border-accent bg-accent text-white" : "border-border text-muted"
+    }`;
+
   return (
     <div>
-      <div className="page-header">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h1>Executions</h1>
-          <p className="page-subtitle">All workflow execution runs.</p>
+          <p className="text-[0.85rem] text-muted">All workflow execution runs.</p>
         </div>
       </div>
 
-      <div className="filter-bar">
-        <Link href="/executions" className={`filter-link ${!activeStatus ? "filter-link-active" : ""}`}>
+      <div className="mb-4 flex flex-wrap gap-2.5">
+        <Link href="/executions" className={filterLinkClass(!activeStatus)}>
           all
         </Link>
         {STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={`/executions?status=${s}`}
-            className={`filter-link ${activeStatus === s ? "filter-link-active" : ""}`}
-          >
+          <Link key={s} href={`/executions?status=${s}`} className={filterLinkClass(activeStatus === s)}>
             {s}
           </Link>
         ))}
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && (
+        <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
+          {error}
+        </div>
+      )}
 
       {!error && (
         <Card>

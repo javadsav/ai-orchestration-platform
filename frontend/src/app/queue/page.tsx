@@ -44,18 +44,24 @@ export default function QueuePage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h1>Queue Monitor</h1>
-          <p className="page-subtitle">Celery worker and task queue status (polling every 5s).</p>
+          <p className="text-[0.85rem] text-muted">
+            Celery worker and task queue status (polling every 5s).
+          </p>
         </div>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && (
+        <div className="rounded-md border border-danger/40 bg-danger/8 px-4 py-3 text-[0.85rem] text-danger">
+          {error}
+        </div>
+      )}
 
       {status && (
         <>
-          <div className="stat-grid">
+          <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
             <StatTile label="Workers" value={status.workers.length} />
             <StatTile label="Active Tasks" value={activeCount} />
             <StatTile label="Reserved Tasks" value={reservedCount} />
@@ -64,7 +70,7 @@ export default function QueuePage() {
 
           <Card title="Workers">
             {status.workers.length === 0 ? (
-              <p className="table-empty">No workers online.</p>
+              <p className="py-4 text-[0.85rem] text-muted">No workers online.</p>
             ) : (
               <ul>
                 {status.workers.map((worker) => (
