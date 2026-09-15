@@ -6,6 +6,7 @@ import { ExecutionStatusBadge } from "@/components/execution/ExecutionStatusBadg
 import { listWorkflows } from "@/lib/api/workflows";
 import { listExecutions } from "@/lib/api/executions";
 import type { Execution, ExecutionStatus } from "@/lib/api/types";
+import { Badge } from "@/components/ui/Badge";
 
 export const dynamic = "force-dynamic";
 
@@ -67,7 +68,7 @@ export default async function DashboardPage() {
       {!error && (
         <>
           <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
-            <StatTile label="Workflows" value={workflowTotal} />
+            <StatTile label="Workflowsss" value={workflowTotal} />
             <StatTile label="Total Executions" value={executionTotal} />
             <StatTile label="Running" value={statusCounts.running} />
             <StatTile label="Succeeded (recent)" value={statusCounts.succeeded} />
@@ -84,9 +85,7 @@ export default async function DashboardPage() {
                 {
                   key: "id",
                   header: "Execution",
-                  render: (row) => (
-                    <Link href={`/executions/${row.id}`}>{row.id.slice(0, 8)}</Link>
-                  ),
+                  render: (row) => <Link href={`/executions/${row.id}`}>{row.id.slice(0, 8)}</Link>,
                 },
                 {
                   key: "workflow",
@@ -109,6 +108,22 @@ export default async function DashboardPage() {
                 },
               ]}
             />
+          </Card>
+          <Card
+            title={
+              <span className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                Active Workflow
+              </span>
+            }
+            actions={
+              <div className="flex items-center gap-2">
+                <Badge tone="success">Running</Badge>
+                <span className="text-sm text-muted">Started 2 minutes ago</span>
+              </div>
+            }
+          >
+            {null}
           </Card>
         </>
       )}
