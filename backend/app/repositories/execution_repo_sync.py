@@ -1,7 +1,7 @@
 """Sync counterparts of execution_repo, used by Celery worker tasks (sync execution model)."""
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
@@ -56,7 +56,7 @@ def create_step(
         stage_order=stage_order,
         attempt=attempt,
         status=status,
-        started_at=datetime.utcnow(),
+        started_at=datetime.now(UTC),
     )
     db.add(step)
     db.flush()
@@ -72,7 +72,7 @@ def finish_step(
     output_payload: dict[str, Any] | None = None,
     error_message: str | None = None,
 ) -> ExecutionStep:
-    finished_at = datetime.utcnow()
+    finished_at = datetime.now(UTC)
     step.status = status
     step.finished_at = finished_at
     if step.started_at is not None:

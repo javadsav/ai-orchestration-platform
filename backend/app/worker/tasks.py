@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app.db.models.execution import ExecutionStatus
 from app.db.models.execution_log import LogLevel
@@ -70,7 +70,7 @@ def run_execution(self, execution_id: str) -> dict:
 
         if execution.status in (ExecutionStatus.PENDING, ExecutionStatus.QUEUED):
             execution = repo.update_execution_status(
-                db, execution, status=ExecutionStatus.RUNNING, started_at=datetime.utcnow()
+                db, execution, status=ExecutionStatus.RUNNING, started_at=datetime.now(UTC)
             )
             _publish_execution_update(execution)
             log = repo.add_log(
@@ -143,7 +143,7 @@ def run_execution(self, execution_id: str) -> dict:
                         db,
                         execution,
                         status=ExecutionStatus.FAILED,
-                        finished_at=datetime.utcnow(),
+                        finished_at=datetime.now(UTC),
                         error_message=str(exc),
                     )
                     db.commit()
@@ -167,7 +167,7 @@ def run_execution(self, execution_id: str) -> dict:
             db,
             execution,
             status=ExecutionStatus.SUCCEEDED,
-            finished_at=datetime.utcnow(),
+            finished_at=datetime.now(UTC),
             result_payload={"stages": stage_outputs},
         )
         db.commit()

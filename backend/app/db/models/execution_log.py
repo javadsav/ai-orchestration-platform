@@ -33,7 +33,13 @@ class ExecutionLog(Base):
         ForeignKey("execution_steps.id", ondelete="CASCADE"), nullable=True
     )
     level: Mapped[LogLevel] = mapped_column(
-        SAEnum(LogLevel, name="log_level"), default=LogLevel.INFO, nullable=False
+        SAEnum(
+            LogLevel,
+            name="log_level",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
+        default=LogLevel.INFO,
+        nullable=False,
     )
     message: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

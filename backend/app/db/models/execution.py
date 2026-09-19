@@ -35,7 +35,11 @@ class Execution(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         ForeignKey("workflows.id", ondelete="CASCADE"), nullable=False, index=True
     )
     status: Mapped[ExecutionStatus] = mapped_column(
-        SAEnum(ExecutionStatus, name="execution_status"),
+        SAEnum(
+            ExecutionStatus,
+            name="execution_status",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
         default=ExecutionStatus.PENDING,
         nullable=False,
         index=True,
