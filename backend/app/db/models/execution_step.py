@@ -37,7 +37,13 @@ class ExecutionStep(UUIDPrimaryKeyMixin, Base):
     stage_key: Mapped[str] = mapped_column(String(100), nullable=False)
     stage_order: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[StepStatus] = mapped_column(
-        SAEnum(StepStatus, name="step_status"), default=StepStatus.PENDING, nullable=False
+        SAEnum(
+            StepStatus,
+            name="step_status",
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
+        default=StepStatus.PENDING,
+        nullable=False,
     )
     attempt: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 

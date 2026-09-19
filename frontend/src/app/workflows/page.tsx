@@ -19,10 +19,10 @@ export default async function WorkflowsPage() {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4  ">
         <div>
           <h1>Workflows</h1>
-          <p className="text-[0.85rem] text-muted">All defined workflow pipelines.</p>
+          <p className="text-[0.85rem] text-muted :">All defined workflow pipelines.</p>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,7 +65,7 @@ async def create_execution(
 async def mark_queued(db: AsyncSession, execution: Execution, *, celery_task_id: str) -> Execution:
     execution.status = ExecutionStatus.QUEUED
     execution.celery_task_id = celery_task_id
-    execution.queued_at = datetime.utcnow()
+    execution.queued_at = datetime.now(UTC)
     await db.flush()
     await db.refresh(execution)
     return execution
